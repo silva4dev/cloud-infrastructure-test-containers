@@ -40,4 +40,9 @@ test("create product", async () => {
     name: "product",
     price: 100
   });
+
+  await dataSource.destroy();
+
+  await mysqlContainer.stop();
 }, 200000);
+
