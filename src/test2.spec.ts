@@ -3,7 +3,7 @@ import { Product } from "./Product";
 import { ProductService } from "./ProductService";
 import { MySqlContainer, StartedMySqlContainer } from "@testcontainers/mysql";
 
-describe("ProductService Tests", () => {
+describe("ProductService 2 Tests", () => {
   let mysqlContainer: StartedMySqlContainer;
   let dataSource: DataSource;
 
@@ -59,24 +59,34 @@ describe("ProductService Tests", () => {
     await mysqlContainer?.stop();
   });
 
-  test("delete product", async () => {
+  test.each([
+    {
+      name: "product",
+      price: 100,
+    },
+    {
+      name: "product",
+      price: 100,
+    },
+    {
+      name: "product",
+      price: 100,
+    },
+    {
+      name: "product",
+      price: 100,
+    },
+  ])("create product", async (productData) => {
     const productService = new ProductService(
       dataSource.getRepository(Product)
     );
 
-    const product = await productService.createProduct({
+    const product = await productService.createProduct(productData);
+
+    expect(product).toEqual({
+      id: expect.any(Number),
       name: "product",
       price: 100
     });
-
-    await productService.deleteProduct(product.id);
-
-    const deletedProduct = await dataSource.getRepository(Product).findOne({
-      where: {
-        id: product.id
-      }
-    });
-
-    expect(deletedProduct).toBeNull();
   });
 });
